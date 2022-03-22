@@ -267,7 +267,6 @@ class GATIDConvLayer(MessagePassing):
     def __init__(self, in_channels, out_channels, heads=1, concat=True,
                  negative_slope=0.2, dropout=0, bias=True, **kwargs):
         super(GATIDConvLayer, self).__init__(aggr='add', **kwargs)
-
         self.in_channels = in_channels
         self.out_channels = out_channels
         self.heads = heads
@@ -312,9 +311,9 @@ class GATIDConvLayer(MessagePassing):
             x = (None if x[0] is None else torch.matmul(x[0], self.weight),
                  None if x[1] is None else torch.matmul(x[1], self.weight))
 
-        return self.propagate(edge_index, size=size, x=x)
+        return self.propagate(edge_index, size_info=size, x=x)
 
-    def message(self, edge_index_i, x_i, x_j, size_i):
+    def message(self, edge_index_i, x_i, x_j, size_info_i):
         # Compute attention coefficients.
         x_j = x_j.view(-1, self.heads, self.out_channels)
         if x_i is None:
@@ -324,12 +323,12 @@ class GATIDConvLayer(MessagePassing):
             alpha = (torch.cat([x_i, x_j], dim=-1) * self.att).sum(dim=-1)
 
         alpha = F.leaky_relu(alpha, self.negative_slope)
-        alpha = softmax(alpha, edge_index_i, num_nodes=size_i)
+        alpha = softmax(alpha, edge_index_i, num_nodes=size_info_i)
 
         # Sample attention coefficients stochastically.
         alpha = F.dropout(alpha, p=self.dropout, training=self.training)
-
-        return x_j * alpha.view(-1, self.heads, 1)
+        result = x_j * alpha.view(-1, self.heads, 1)
+        return result.squeeze(1)
 
     def update(self, aggr_out):
         if self.concat is True:
