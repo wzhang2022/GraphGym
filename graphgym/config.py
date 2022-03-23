@@ -144,6 +144,9 @@ def set_cfg(cfg):
     # Dimension for edge feature. Updated by the real dim of the dataset
     cfg.dataset.edge_dim = 128
 
+    # Maximum size of a graph in the dataset. This should must be set
+    cfg.dataset.max_graph_size = 0
+
     # ============== Link/edge tasks only
 
     # all or disjoint
@@ -370,6 +373,10 @@ def set_cfg(cfg):
 
     # randomly use fewer edges for message passing
     cfg.gnn.keep_edge = 0.5
+
+    # Hyperparameters of heads for treansformer-based models
+    cfg.gnn.num_heads = 8
+    cfg.gnn.dim_head = 32
 
     # ------------------------------------------------------------------------ #
     # Optimizer options

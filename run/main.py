@@ -7,6 +7,7 @@ import logging
 from graphgym.cmd_args import parse_args
 from graphgym.config import (cfg, assert_cfg, dump_cfg,
                              update_out_dir, get_parent_dir)
+from graphgym.contrib.loader.additional_attributes_loader import create_loader_with_node_distances
 from graphgym.loader import create_dataset, create_loader
 from graphgym.logger import setup_printing, create_logger
 from graphgym.optimizer import create_optimizer, create_scheduler
@@ -40,7 +41,7 @@ if __name__ == '__main__':
         auto_select_device()
         # Set learning environment
         datasets = create_dataset()
-        loaders = create_loader(datasets)
+        loaders = create_loader_with_node_distances(datasets)
         meters = create_logger(datasets)
         model = create_model(datasets)
         optimizer = create_optimizer(model.parameters())

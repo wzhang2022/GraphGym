@@ -2,6 +2,8 @@ import torch
 import time
 import logging
 
+from tqdm import tqdm
+
 from graphgym.config import cfg
 from graphgym.loss import compute_loss
 from graphgym.utils.epoch import is_eval_epoch, is_ckpt_epoch
@@ -11,7 +13,7 @@ from graphgym.checkpoint import load_ckpt, save_ckpt, clean_ckpt
 def train_epoch(logger, loader, model, optimizer, scheduler):
     model.train()
     time_start = time.time()
-    for batch in loader:
+    for _, batch in enumerate(tqdm(loader)):
         optimizer.zero_grad()
         batch.to(torch.device(cfg.device))
         pred, true = model(batch)

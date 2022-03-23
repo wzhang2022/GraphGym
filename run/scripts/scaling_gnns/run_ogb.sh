@@ -4,9 +4,9 @@ cd ../..
 
 DIR=scaling_gnns
 CONFIG=graph_ogb_test
-GRID=graph_ogb_test
+GRID=graph_graphormer_v1
 REPEAT=3
-MAX_JOBS=12
+MAX_JOBS=4
 SLEEP=1
 MAIN=main
 
