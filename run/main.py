@@ -7,7 +7,6 @@ import logging
 from graphgym.cmd_args import parse_args
 from graphgym.config import (cfg, assert_cfg, dump_cfg,
                              update_out_dir, get_parent_dir)
-from graphgym.contrib.loader.additional_attributes_loader import create_loader_with_node_distances
 from graphgym.loader import create_dataset, create_loader
 from graphgym.logger import setup_printing, create_logger
 from graphgym.optimizer import create_optimizer, create_scheduler
@@ -18,6 +17,13 @@ from graphgym.utils.comp_budget import params_count
 from graphgym.utils.device import auto_select_device
 from graphgym.contrib.train import *
 from graphgym.register import train_dict
+
+import warnings
+
+def warn(*args, **kwargs):
+    pass
+warnings.warn = warn
+
 
 if __name__ == '__main__':
     # Load cmd line args
@@ -41,7 +47,7 @@ if __name__ == '__main__':
         auto_select_device()
         # Set learning environment
         datasets = create_dataset()
-        loaders = create_loader_with_node_distances(datasets)
+        loaders = create_loader(datasets)
         meters = create_logger(datasets)
         model = create_model(datasets)
         optimizer = create_optimizer(model.parameters())
@@ -52,6 +58,7 @@ if __name__ == '__main__':
         cfg.params = params_count(model)
         logging.info('Num parameters: {}'.format(cfg.params))
         # Start training
+        # with autograd.detect_anomaly():
         if cfg.train.mode == 'standard':
             train(meters, loaders, model, optimizer, scheduler)
         else:

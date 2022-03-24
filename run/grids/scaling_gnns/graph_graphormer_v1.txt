@@ -1,7 +1,7 @@
 # name in config.py; short name; range to search
 
 
-# task: node, dataset: syn; model: idgnn
+# task: node, dataset: syn; model: graphormer
 dataset.format format ['OGB']
 dataset.name dataset ['ogbg-molhiv']
 dataset.transform transform ['none']
@@ -14,6 +14,9 @@ gnn.layers_pre_mp l_pre [1]
 gnn.layers_mp l_mp [3]
 gnn.layers_post_mp l_post [3]
 gnn.layer_type layer ['graphormerlayer']
+gnn.stage_type stage ['skipsum']
 gnn.num_heads num_heads [4]
 gnn.dim_head dim_head [32]
-optim.max_epoch epoch [100]
+optim.max_epoch epoch [20]
+train.batch_size batch_size [64]
+train.ckpt_period ckpt_period [100]
