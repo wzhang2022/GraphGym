@@ -194,7 +194,7 @@ def transform_after_split(datasets):
 def create_dataset():
     ## Load dataset
     time1 = time.time()
-    if cfg.dataset.format == 'OGB':
+    if cfg.dataset.format in ['OGB', 'graphormer_dataset', 'spectral_cluster_dataset']:
         graphs, splits = load_dataset()
     else:
         graphs = load_dataset()
@@ -219,7 +219,7 @@ def create_dataset():
     ## Split dataset
     time3 = time.time()
     # Use custom data splits
-    if cfg.dataset.format == 'OGB':
+    if cfg.dataset.format in ['OGB', 'graphormer_dataset', 'spectral_cluster_dataset']:
         datasets = []
         datasets.append(dataset[splits['train']])
         datasets.append(dataset[splits['valid']])
@@ -247,24 +247,6 @@ def create_dataset():
 
 
 def create_loader(datasets):
-    if cfg.gnn.layer_type == 'graphormerlayer':
-        for dataset in datasets:
-            for graph in dataset.graphs:
-                distances = np.ones((graph.num_nodes, graph.num_nodes), dtype=np.int64) * -1
-                for i, distance_dict in nx.shortest_path_length(graph.G):
-                    for j in distance_dict:
-                        distances[i][j] = distance_dict[j]
-                setattr(graph, 'shortest_path', distances)
-    elif cfg.gnn.layer_type == 'clustergcn':
-        for dataset in datasets:
-            for _, graph in enumerate(tqdm(dataset.graphs)):
-                clustering_algo = SpectralClustering(n_clusters=cfg.gnn.n_clusters, affinity='precomputed')
-                if graph.G.number_of_nodes() < cfg.gnn.n_clusters:
-                    setattr(graph, 'cluster_labels', np.arange(graph.G.number_of_nodes()))
-                else:
-                    clusters = clustering_algo.fit(nx.to_numpy_array(graph.G))
-                    setattr(graph, 'cluster_labels', clusters.labels_)
-
     loader_train = DataLoader(datasets[0], collate_fn=Batch.collate(),
                               batch_size=cfg.train.batch_size, shuffle=True,
                               num_workers=cfg.num_workers, pin_memory=False)

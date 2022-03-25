@@ -1,0 +1,19 @@
+# name in config.py; short name; range to search
+
+
+# task: node, dataset: syn; model: clustergcn
+dataset.format format ['spectral_cluster_dataset']
+dataset.name dataset ['ogbg-molhiv']
+dataset.transform transform ['none']
+dataset.task task ['graph']
+dataset.transductive trans [False]
+dataset.augment_feature feature [[]]
+dataset.augment_label label ['']
+dataset.max_graph_size max_graph_size [20]
+gnn.layers_pre_mp l_pre [1]
+gnn.layers_mp l_mp [3]
+gnn.layers_post_mp l_post [3]
+gnn.layer_type layer ['clustergcn']
+gnn.stage_type stage ['skipsum']
+gnn.n_clusters n_clusters [4, 6, 8, 10, 12, 14, 16, 18, 20]
+optim.max_epoch epoch [20]

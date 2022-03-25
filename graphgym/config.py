@@ -378,6 +378,9 @@ def set_cfg(cfg):
     cfg.gnn.num_heads = 8
     cfg.gnn.dim_head = 32
 
+    # Number of clusters to pre-process for cluster-based models
+    cfg.gnn.n_clusters = 10
+
     # ------------------------------------------------------------------------ #
     # Optimizer options
     # ------------------------------------------------------------------------ #
