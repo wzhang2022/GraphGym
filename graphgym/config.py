@@ -42,7 +42,7 @@ def set_cfg(cfg):
     cfg.seed = 1
 
     # Print rounding
-    cfg.round = 4
+    cfg.round = 6
 
     # Tensorboard support for each run
     cfg.tensorboard_each_run = False

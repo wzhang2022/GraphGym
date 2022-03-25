@@ -35,8 +35,8 @@ class GCNClusteredConv(nn.Module):
             index=batch_cluster_labels.long(),
             dim=0
         )
-
-        # assert cluster_embeddings.shape == (num_clusters, transformed_node_feature.shape[1])
+        out_dim = transformed_node_feature.shape[1]
+        assert cluster_embeddings.shape == (num_clusters, out_dim)
 
         # message pass from clusters to node neighbors, weighted by repetitions of edge
         # edge_indices_i = batch_cluster_labels[batch.edge_index[0]].unsqueeze(1).repeat((1, node_feat_dim))
@@ -44,14 +44,20 @@ class GCNClusteredConv(nn.Module):
         unique_edges, unique_edge_idx, edge_counts = torch.unique(
             cluster_to_node_edges, dim=1, return_inverse=True, return_counts=True
         )
-        messages = torch.gather(cluster_embeddings, dim=0, index=unique_edges[0].long())
-        # assert messages.shape == (unique_edges.shape[0], transformed_node_feature.shape[1])
+        messages = torch.gather(
+            cluster_embeddings,
+            dim=0,
+            index=unique_edges[0].unsqueeze(1).repeat((1, out_dim)).long()
+        )
+        assert messages.shape == (unique_edges.shape[1], out_dim), f"messages {messages.shape}, unique {unique_edges.shape}, cluster {cluster_embeddings.shape}"
         messages *= edge_counts.unsqueeze(1).float()
 
         batch.node_feature = torch_scatter.scatter_add(
             src=messages, index=unique_edges[1], dim=0, dim_size=num_nodes
-        ) / degree(batch.edge_index[1], num_nodes=num_nodes, dtype=float)
-        # assert batch.node_feature.shape == (num_nodes, transformed_node_feature.shape[1])
+        )
+        assert batch.node_feature.shape == (num_nodes, out_dim)
+        denominator = degree(batch.edge_index[1], num_nodes=num_nodes).float().clip(min=1)
+        batch.node_feature = batch.node_feature / denominator.unsqueeze(1)
         return batch
 
 

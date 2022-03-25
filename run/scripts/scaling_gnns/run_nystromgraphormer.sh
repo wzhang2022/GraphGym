@@ -4,7 +4,7 @@ cd ../..
 
 DIR=scaling_gnns
 CONFIG=graph_ogb_test
-GRID=graph_clusterconv_v1
+GRID=graph_nystromgraphormer_v1
 REPEAT=3
 MAX_JOBS=1
 SLEEP=1
